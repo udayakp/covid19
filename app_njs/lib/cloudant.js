@@ -2,6 +2,9 @@ const Cloudant = require('@cloudant/cloudant');
 
 const cloudant_id = process.env.CLOUDANT_ID || '<cloudant_id>'
 const cloudant_apikey = process.env.CLOUDANT_IAM_APIKEY || '<cloudant_apikey>';
+const User = require('./models/user.js')
+const bcrypt = require('bcrypt');
+
 
 // UUID creation
 const uuidv4 = require('uuid/v4');
@@ -9,33 +12,33 @@ const uuidv4 = require('uuid/v4');
 var cloudant = new Cloudant({
     account: cloudant_id,
     plugins: {
-      iamauth: {
-        iamApiKey: cloudant_apikey
-      }
+        iamauth: {
+            iamApiKey: cloudant_apikey
+        }
     }
-  })
+})
 
 // Cloudant DB reference
 let db;
 let db_name = "community_db";
 
 /**
- * Connects to the Cloudant DB, creating it if does not already exist
- * @return {Promise} - when resolved, contains the db, ready to go
- */
+* Connects to the Cloudant DB, creating it if does not already exist
+* @return {Promise} - when resolved, contains the db, ready to go
+*/
 const dbCloudantConnect = () => {
     return new Promise((resolve, reject) => {
         Cloudant({  // eslint-disable-line
             account: cloudant_id,
-                plugins: {
-                    iamauth: {
-                        iamApiKey: cloudant_apikey
-                    }
+            plugins: {
+                iamauth: {
+                    iamApiKey: cloudant_apikey
                 }
+            }
         }, ((err, cloudant) => {
             if (err) {
                 console.log('Connect failure: ' + err.message + ' for Cloudant ID: ' +
-                    cloudant_id);
+                cloudant_id);
                 reject(err);
             } else {
                 cloudant.db.list().then((body) => {
@@ -71,18 +74,18 @@ const dbCloudantConnect = () => {
 })();
 
 /**
- * Find all resources that match the specified partial name.
- * 
- * @param {String} type
- * @param {String} partialName
- * @param {String} userID
- * 
- * @return {Promise} Promise - 
- *  resolve(): all resource objects that contain the partial
- *          name, type or userID provided, or an empty array if nothing
- *          could be located that matches. 
- *  reject(): the err object from the underlying data store
- */
+* Find all resources that match the specified partial name.
+* 
+* @param {String} type
+* @param {String} partialName
+* @param {String} userID
+* 
+* @return {Promise} Promise - 
+*  resolve(): all resource objects that contain the partial
+*          name, type or userID provided, or an empty array if nothing
+*          could be located that matches. 
+*  reject(): the err object from the underlying data store
+*/
 function find(type, partialName, userID) {
     return new Promise((resolve, reject) => {
         let selector = {}
@@ -92,7 +95,7 @@ function find(type, partialName, userID) {
         if (partialName) {
             let search = `(?i).*${partialName}.*`;
             selector['name'] = {'$regex': search};
-
+            
         }
         if (userID) {
             selector['userID'] = userID;
@@ -111,14 +114,14 @@ function find(type, partialName, userID) {
 }
 
 /**
- * Delete a resource that matches a ID.
- * 
- * @param {String} id
- * 
- * @return {Promise} Promise - 
- *  resolve(): Status code as to whether to the object was deleted
- *  reject(): the err object from the underlying data store
- */
+* Delete a resource that matches a ID.
+* 
+* @param {String} id
+* 
+* @return {Promise} Promise - 
+*  resolve(): Status code as to whether to the object was deleted
+*  reject(): the err object from the underlying data store
+*/
 function deleteById(id, rev) {
     return new Promise((resolve, reject) => {
         db.get(id, (err, document) => {
@@ -138,19 +141,19 @@ function deleteById(id, rev) {
 }
 
 /**
- * Create a resource with the specified attributes
- * 
- * @param {String} type - the type of the item
- * @param {String} name - the name of the item
- * @param {String} description - the description of the item
- * @param {String} quantity - the quantity available 
- * @param {String} location - the GPS location of the item
- * @param {String} contact - the contact info 
- * @param {String} userID - the ID of the user 
- * 
- * @return {Promise} - promise that will be resolved (or rejected)
- * when the call to the DB completes
- */
+* Create a resource with the specified attributes
+* 
+* @param {String} type - the type of the item
+* @param {String} name - the name of the item
+* @param {String} description - the description of the item
+* @param {String} quantity - the quantity available 
+* @param {String} location - the GPS location of the item
+* @param {String} contact - the contact info 
+* @param {String} userID - the ID of the user 
+* 
+* @return {Promise} - promise that will be resolved (or rejected)
+* when the call to the DB completes
+*/
 function create(type, name, description, quantity, location, contact, userID) {
     return new Promise((resolve, reject) => {
         let itemId = uuidv4();
@@ -179,23 +182,23 @@ function create(type, name, description, quantity, location, contact, userID) {
 }
 
 /**
- * Update a resource with the requested new attribute values
- * 
- * @param {String} id - the ID of the item (required)
- * 
- * The following parameters can be null
- * 
- * @param {String} type - the type of the item
- * @param {String} name - the name of the item
- * @param {String} description - the description of the item
- * @param {String} quantity - the quantity available 
- * @param {String} location - the GPS location of the item
- * @param {String} contact - the contact info 
- * @param {String} userID - the ID of the user 
- * 
- * @return {Promise} - promise that will be resolved (or rejected)
- * when the call to the DB completes
- */
+* Update a resource with the requested new attribute values
+* 
+* @param {String} id - the ID of the item (required)
+* 
+* The following parameters can be null
+* 
+* @param {String} type - the type of the item
+* @param {String} name - the name of the item
+* @param {String} description - the description of the item
+* @param {String} quantity - the quantity available 
+* @param {String} location - the GPS location of the item
+* @param {String} contact - the contact info 
+* @param {String} userID - the ID of the user 
+* 
+* @return {Promise} - promise that will be resolved (or rejected)
+* when the call to the DB completes
+*/
 function update(id, type, name, description, quantity, location, contact, userID) {
     return new Promise((resolve, reject) => {
         db.get(id, (err, document) => {
@@ -213,7 +216,7 @@ function update(id, type, name, description, quantity, location, contact, userID
                 if (location) {item["location"] = location} else {item["location"] = document.location};
                 if (contact) {item["contact"] = contact} else {item["contact"] = document.contact};
                 if (userID) {item["userID"] = userID} else {item["userID"] = document.userID};
- 
+                
                 db.insert(item, (err, result) => {
                     if (err) {
                         console.log('Error occurred: ' + err.message, 'create()');
@@ -227,17 +230,17 @@ function update(id, type, name, description, quantity, location, contact, userID
     });
 }
 
-function createuser(userID, name, pass, email) {
+function createUser(username, password, email) {
     return new Promise((resolve, reject) => {
-        let whenCreated = Date.now();
-        let user = {
-            userID:userID,
-            name:name,
-            pass:pass,
-            email:email,
-            whenCreated: whenCreated
-        };
-        db.insert(user, (err, result) => {
+        let user = null;
+        try {
+            user = new User(username, password, email);
+        } catch (err) {
+            console.log(err.name + ' ' + err.message);
+        }
+        
+        db.insert()
+        db.insert(user, username, (err, result) => {
             if (err) {
                 console.log('Error occurred: ' + err.message, 'create()');
                 reject(err);
@@ -248,19 +251,36 @@ function createuser(userID, name, pass, email) {
     });
 }
 
-function finduser(userID , pass) {
+function findUser(username, pass) {
     return new Promise((resolve, reject) => {
-        let selector = {}
-        if (userID) {
-            selector['userID'] = userID;
-            console.log("user"+userID);
+        db.get(username).then((user) => {
+            console.log("Found user: ", user);
+            if (_verifyPassword(pass, user.passwordHash)) {
+                console.log(pass, user.passwordHash);
+                resolve(user);
+            } else {
+                error = new Error("Password did not match");
+                reject(error);
+            }
+        }, (error) => {
+            console.log(error.name + ' ' + error.message);
+            reject(error);
+        });
+    });
+}
+
+function listUsers(){
+    return new Promise((resolve,reject) => {
+        let selector ={
+            "$and": [
+                {
+                    "userID": { "$gt": null }
+                },
+                {
+                    "pass": {  "$gt": null }
+                }
+            ]
         }
-        if (pass) {
-            //let search = `(?i).*${}.*`;
-            selector['pass'] = pass;
-            console.log("pass"+pass);
-        }
-        
         db.find({ 
             'selector': selector
         }, (err, documents) => {
@@ -268,36 +288,16 @@ function finduser(userID , pass) {
                 reject(err);
             } else {
                 resolve({ data: JSON.stringify(documents.docs), statusCode: 200});
-                console.log(documents.docs);
+                console.log(documents.docs)
             }
-        });
+        });    
+        
     });
 }
 
-function userlist(){
-    return new Promise((resolve,reject) => {
-        let selector ={
-              "$and": [
-                {
-                    "userID": { "$gt": null }
-                },
-                {
-                  "pass": {  "$gt": null }
-                }
-              ]
-            }
-            db.find({ 
-                'selector': selector
-            }, (err, documents) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve({ data: JSON.stringify(documents.docs), statusCode: 200});
-                    console.log(documents.docs)
-                }
-            });    
-
-    });
+function _verifyPassword(password, password_hash) {
+    console.log(password, password_hash);
+    return bcrypt.compareSync(password, password_hash)
 }
 
 module.exports = {
@@ -305,7 +305,7 @@ module.exports = {
     create: create,
     update: update,
     find: find,
-    createuser: createuser,
-    finduser: finduser,
-    userlist: userlist
-  };
+    createUser: createUser,
+    findUser: findUser,
+    listUsers: listUsers
+};

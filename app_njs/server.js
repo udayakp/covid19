@@ -19,8 +19,8 @@ app.get('/', (req, res) => {
   //console.log(req)
   console.log(res.body);
   return res.json({
-  status: 'ok'
-});
+    status: 'ok'
+  });
 });
 
 authrouter = require('./lib/authroutes.js');
@@ -36,7 +36,7 @@ const handleError = (res, err) => {
 
 
 const server = app.listen(port, () => {
-   const host = server.address().address;
-   const port = server.address().port;
-   console.log(`SolutionStarterKitCooperationServer listening at http://${host}:${port}`);
+  const host = server.address().address;
+  const port = server.address().port;
+  console.log(`SolutionStarterKitCooperationServer listening at http://${host}:${port}`);
 });
