@@ -20,7 +20,7 @@ const message = (text, sessionId) => {
   } else if (!text) {
     return Promise.reject('No user input provided.')
   }
-
+  
   const payload = {
     assistantId: assistantId,
     sessionId: sessionId,
@@ -29,7 +29,7 @@ const message = (text, sessionId) => {
       text: text
     }
   };
-
+  
   return new Promise((resolve, reject) => {
     assistant.message(payload, (err, data) => {
       if (err) {
@@ -45,7 +45,7 @@ const session = () => {
   if (!assistantId || assistantId === '<assistant_id>') {
     return Promise.reject('ASSISTANT_ID has not been configured');
   }
-
+  
   return assistant.createSession({
     assistantId: assistantId
   }).then(response => response.result['session_id']);
