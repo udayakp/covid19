@@ -1,4 +1,5 @@
 import 'package:app_flutter/notifiers/UserNotifier.dart';
+import 'package:app_flutter/ui/screens/list.dart';
 import 'package:app_flutter/ui/screens/loginscreen.dart';
 import 'package:flutter/material.dart';
 
@@ -87,13 +88,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage(title:'Login')),
-                );
-                
+                );                
               } ,
             ),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text('Settings'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserList(title:'Login')),
+                );                
+              } ,
             ),
             ListTile(
               leading: Icon(Icons.close),
