@@ -20,6 +20,7 @@ class UserNotifier extends ChangeNotifier {
     _users = await _api.getUsers();
     _status = Status.done;
     notifyListeners();
+    return _users;
   }
 
   getUserAuth(String id, String pass) async {
@@ -28,5 +29,6 @@ class UserNotifier extends ChangeNotifier {
     _singleUser = await getUserAuth(id,pass);
     _status = Status.done;
     notifyListeners();
+    return _singleUser;
   }
 }

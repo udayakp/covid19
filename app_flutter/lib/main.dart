@@ -1,8 +1,15 @@
+import 'package:app_flutter/notifiers/UserNotifier.dart';
 import 'package:app_flutter/ui/screens/homescreen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserNotifier(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -10,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Item Finder',
+      title: 'Items Finder',
       theme: ThemeData(
         // This is the theme of your application.
         //

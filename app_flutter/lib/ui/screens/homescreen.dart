@@ -93,11 +93,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: Icon(Icons.settings),
-              title: Text('Settings'),
+              title: Text('Users List'),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => UserList(title:'Login')),
+                  MaterialPageRoute(builder: (context) => UserList()),
                 );                
               } ,
             ),
