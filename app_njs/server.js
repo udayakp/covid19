@@ -28,6 +28,14 @@ authrouter = require('./lib/authroutes.js');
 app.use('/api/',authrouter);
 
 
+assistrouter = require('./lib/assistroutes.js');
+
+app.use('/api/',assistrouter);
+
+resrouter = require('./lib/assistroutes.js');
+
+app.use('/api/',resrouter);
+
 const handleError = (res, err) => {
   const status = err.code !== undefined && err.code > 0 ? err.code : 500;
   return res.status(status).json(err);

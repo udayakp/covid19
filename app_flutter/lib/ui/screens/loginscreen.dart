@@ -12,8 +12,9 @@ class _LoginPageState extends State<LoginPage> {
   var _counter = 0;
 
   String email;
-
+  String userName;
   String password;
+
   void _incrementCounter() {
     setState(() {
       _counter++;
@@ -29,6 +30,10 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       return false;
     }
+  }
+
+  newUserCheck() {
+    return true;
   }
 
   String validateEmail(String value) {
@@ -107,8 +112,26 @@ class _LoginPageState extends State<LoginPage> {
                 key: formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
+                  children: <Widget>[   
               Padding(
+                  padding: EdgeInsets.only(
+                      left: 25.0,
+                      right: 25.0,
+                      top: 20.0,
+                      bottom: 5.0),
+                  child: Container(
+                    height: 50.0,
+                    child: TextFormField(
+                      decoration:
+                          InputDecoration(hintText: 'userName'),
+                      validator: (value) => value.isEmpty
+                          ? 'Username is required':null,
+                      onChanged: (value) {
+                        this.userName = value;
+                      },
+                    ),
+                  )),
+               Padding(
                   padding: EdgeInsets.only(
                       left: 25.0,
                       right: 25.0,

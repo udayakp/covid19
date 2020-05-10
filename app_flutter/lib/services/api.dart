@@ -12,8 +12,8 @@ Future<List<UserModel>> getUserAuth(String userId, String pass) async {
   final response = await http.post(
     '$_baseUrl/api/login',
       body: json.encode(
-        {'UserId': '$userId',
-         'pass':'$pass'},
+        {'username': '$userId',
+         'password':'$pass'},
       ),
       headers: {'Content-Type': "application/json"},
     );
@@ -30,10 +30,9 @@ Future<List<UserModel>> addUser(String userId, String pass,String name, String e
   final response = await http.post(
     '$_baseUrl/api/register',
       body: json.encode(
-        {'UserId': '$userId',
-         'pass':'$pass',
-         'email':'$email',
-         'name':'$name'},
+        {'username': '$userId',
+         'password':'$pass',
+         'email':'$email'}
       ),
       headers: {'Content-Type': "application/json"},
     );
